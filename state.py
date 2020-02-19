@@ -26,8 +26,12 @@ class State:
 
 	def display(self):
 		print("player turn: " + self.turn)
-
+		rownum = 8
 		for row in self.matrix:
+			print(str(rownum)+'|', end ='')
+			rownum += -1
 			for value in row:
 				print(value, end = ' ')
 			print("")
+
+		print(' |a b c d e f g h')
