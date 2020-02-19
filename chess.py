@@ -41,7 +41,11 @@ def validMoves(currentState, posFrom):
 	y = posFrom[1]
 	moves = []
 	if matrix[y][x] == 'P' and player == 'white':
-		if (y > 0):
+		if y == 6:
+			moves.append((x,y-1))
+			moves.append((x,y-2))
+
+		elif (y > 0):
 			if matrix[y-1][x] == '_': #move straight
 				moves.append(tuple([x,y-1]))
 			if (x >0):
@@ -52,7 +56,10 @@ def validMoves(currentState, posFrom):
 					moves.append(tuple([x+1,y-1]))
 
 	elif matrix[y][x] == 'p' and player == 'black':
-		if (y < 7):
+		if y == 1:
+			moves.append((x,y+1))
+			moves.append((x,y+2))
+		elif (y < 7):
 			if matrix[y+1][x] == '_': #move straight
 				moves.append(tuple([x,y+1]))
 			if (x >0):
@@ -625,15 +632,16 @@ def runGameUser(matrix,exploreMethod):
 			print("The game has ended")
 			return
 
-		if currentState.getTurn() == 'white':
-			(score,currentState,nodesExplored) = alpha_beta_max(currentState,-10000000, 10000000,0,exploreMethod)
+		if currentState.getTurn() == 'black':
+			(score,currentState,nodesExplored) = alpha_beta_min(currentState,-10000000, 10000000,0,exploreMethod)
 			print('nodes explored: '+str(nodesExplored) )
 			print('score: ' + str(score))			
 			#add code for AI
 		else:
 			validEntry = False
 			while validEntry == False:
-				print('enter input. starting position <space> end position (example:a2 a3:')
+				print('Your turn (White Player)')
+				print('enter starting position and end position (example:\'a2 a3\'')
 				user = input()
 				if user == 'finish':
 					finish = True
@@ -669,13 +677,3 @@ def endgame(currentState):
 
 	return (whiteWin or blackWin)
 
-
-
-
-
-#print("Initial State B")
-#display(initialB)
-#print("")
-#print("Initial State C")
-#display(initialC)
-#print("")
