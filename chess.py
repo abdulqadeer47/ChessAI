@@ -3,21 +3,18 @@ import math
 import random
 from state import*
 
+#to change the depth of search tree, change lines 576 and 625. Default value at 4
+#to change the number of moves simulated, change line 669.
 
 ###########################################################	
-# Display method:                                         #
-# prints out the given 2d matrix to the console			  #
-# Paramters:                                              #
-# 1) matrix: 2d array to print to console  				  #
+# Method: Evaluation Function                                  
+# Paramters: 
+# 	currentState: the state we are currenlty at
+# Returns: A value of the heuristic                                           
 ###########################################################
-def display(matrix):
-	for row in matrix:
-		for value in row:
-			print(value, end = ' ')
-		print("")
 
 def evalFunction(currentState):
-	#a dict containing rienfield values for each piece
+	#a dict containing Renfield values for each piece
 	r_values = {'P' : 1, 'N' : 3, 'B' : 3, 'R' : 5, 'Q' : 9, 'p' : -1, 'n' : -3, 'b' : -3, 'r' : -5, 'q' : -9 ,'_' : 0,'K' : 10000, 'k': -10000}
 	function_sum = 0
 	matrix = currentState.getMatrix()
@@ -25,16 +22,26 @@ def evalFunction(currentState):
 		for value in row:
 			function_sum += r_values[value]
 
-	#add time component
+	#deduct depth penalty so quicker endgame is encouraged
 	function_sum += currentState.getDepth() * -0.01
+
 	return function_sum
 
-
+###########################################################	
+# Method: Valid Moves                                  
+# Paramters: 
+# 	currentState: the state we are currenlty at
+#	posFrom: The position of the piece we are
+#			 checking possible moves for
+# Returns: A list of all possible moves that piece can move to 
+#			returns an array of tuples, each one containing all
+#			possible positions the piece can move to. For 
+#			example, for a white knight on the starting board 
+#			at (7,2), it will return [(5,3),(5,1)] etc.		                                          
+###########################################################
 
 def validMoves(currentState, posFrom):
-	#conditional statements that returns an array of tuples, each one containing all
-	#possible positions the piece can move to. For example, for a white knight on the starting
-	#board at (7,2), it will return [(5,3),(5,1)] etc.
+
 	matrix = currentState.getMatrix()
 	player = currentState.getTurn()
 	x = posFrom[0]
@@ -439,12 +446,17 @@ def validMoves(currentState, posFrom):
 			else:
 				break
 	
-
-	#add more for each piece. 
-	#Note: it will be the same for both white and black for pieces other than the pawn.
 	return moves
 
-#takes in a tuple, sorts by distance
+###########################################################	
+# Method: Sort Valid Moves                                   
+# Paramters: 
+# 	positions: a list of tuples that contain the possible
+#			moves a piece can move to
+#	posFrom: the position of the piece that is to be moved
+# Returns: A list of possible final positions, now sorted by the 
+#			straigh line distance from the original position                                         
+###########################################################
 def sortValidMoves(positions, posFrom):
 	distance = []
 	newpositions = []
@@ -459,7 +471,15 @@ def sortValidMoves(positions, posFrom):
 	return newpositions
 
 
-#moves the piece and updates state accordingly
+###########################################################	
+# Method: Move                                  
+# Paramters: 
+# 	currentState: the state we are currenlty at
+#	posFrom: The position of the piece currenlty
+#	posTo: The position we want to move the piece to
+# Returns: A new state, with the updated board and the next
+#		player's turn                                           
+###########################################################
 def move(currentState, posFrom, posTo):
 	x = posFrom[0]
 	y = posFrom[1]
@@ -473,9 +493,15 @@ def move(currentState, posFrom, posTo):
 
 	return new_State
 
-#Exploration policy 1
+
+###########################################################	
+# Method: Exploration Policy 1                              
+# Paramters: 
+# 	currentState: the state we are currently at
+# Returns:  a list of tuples with x,y coordinates of all 
+#			of the players pieces                                   
+###########################################################
 def explore1(currentState):
-	#returns a list of tuples with x,y coordinates of all of the players pieces
 	pieces = []
 	turn = currentState.getTurn()
 	x = 0
@@ -494,10 +520,15 @@ def explore1(currentState):
 
 	return pieces
 
-#Exploration policy 2
+###########################################################	
+# Method: Exploration Policy 2                              
+# Paramters: 
+# 	currentState: the state we are currently at coordinates
+# Returns:  returns a list of tuples with x,y of all the 
+#			pieces based on importance
+#			the order is: king, queen, rook, knight, bishop, pawn.                                  
+###########################################################
 def explore2(currentState):
-	#returns a list of tuples with x,y coordinates of all the pieces based on importance
-	#the order is: king, queen, rook, knight, bishop, pawn.
 	pieces = explore1(currentState)
 	newpieces = []
 	matrix = currentState.getMatrix()
@@ -523,6 +554,21 @@ def explore2(currentState):
 
 	return newpieces
 
+###########################################################	
+# Method: Alpha Beta Max                             
+# Paramters: 
+# 	currentState: the state we are currently at
+#	alpha: The alpha value we currently have, this is the 
+#			lower limit
+#	beta: The beta value we currently have, this is the
+#			upper limit
+#	depth: The depth of the search tree. It is used for 
+#			the cutoff
+#	exploreMethod: The explore method being used for children
+#			nodes, it take values of 1 or 2.
+# Returns:  The alpha value, the best state so far, and
+#			the number of nodes explored at this stage                                   
+###########################################################
 def alpha_beta_max(currentState, alpha, beta, depth,exploreMethod):
 	nodesExplored = 0
 	#print("running alpha max")
@@ -546,21 +592,32 @@ def alpha_beta_max(currentState, alpha, beta, depth,exploreMethod):
 			nextState = move(currentState,piece,possibleMove)
 			(score,x,morenodes) = alpha_beta_min(nextState, alpha, beta, depth + 1,exploreMethod)
 			nodesExplored +=morenodes
-			#nextState.display()
 			if bestState == None:
 				bestState = nextState
-			if score >= beta:
-				return (score,nextState,nodesExplored) #beta-cutoff
+			if score >= beta: # beta cutoff is exceeded
+				return (score,nextState,nodesExplored) 
 			if score > alpha:
 				bestState = nextState
 				alpha = score #alpha keeps the maximum value from child
-			# print("depth: "+ str(depth))
-			# print("alpha: "+ str(alpha))
-			# print("beta: "+ str(beta))
+
 	return (alpha,bestState,nodesExplored)
 
 
-
+###########################################################	
+# Method: Alpha Beta Min                             
+# Paramters: 
+# 	currentState: the state we are currently at
+#	alpha: The alpha value we currently have, this is the 
+#			lower limit
+#	beta: The beta value we currently have, this is the
+#			upper limit
+#	depth: The depth of the search tree. It is used for 
+#			the cutoff
+#	exploreMethod: The explore method being used for children
+#			nodes, it take values of 1 or 2.
+# Returns:  The beta value, the best state so far, and
+#			the number of nodes explored at this stage                                   
+###########################################################
 def alpha_beta_min(currentState, alpha, beta, depth,exploreMethod):
 	nodesExplored = 0
 	#print("running alpha min")
@@ -583,23 +640,30 @@ def alpha_beta_min(currentState, alpha, beta, depth,exploreMethod):
 		for possibleMove in moves:
 			nextState = move(currentState,piece,possibleMove)
 			(score,x,morenodes) = alpha_beta_max(nextState,alpha,beta, depth+1,exploreMethod)
-			#nextState.display()
 			nodesExplored +=morenodes
 
 			if bestState == None:
 				bestState = nextState
 
-			if score <= alpha:
+			if score <= alpha: #alpha cutoff is exceeded
 				return (score,nextState,nodesExplored)
-			if score < beta:
+			if score < beta: #beta used to keep the minimum value
 				bestState = nextState
 				beta = score	
-			#print("depth: "+ str(depth))
-			#print("alpha: "+ str(alpha))
-			#print("beta: "+ str(beta))
+
 	return (beta,bestState,nodesExplored)
 
-#Main method that runs with both players simulated by the AI
+
+###########################################################	
+# Method: Run Game (by AI simulation for both players)                        
+# Paramters: 
+# 	currentState: the state we are currently at
+#	exploreMethod: The explore method being used for children
+#			nodes, it take values of 1 or 2.
+# Returns:  Nothing. Just plays the game until depth limit
+#			is reached or king is captured.
+#                                 
+###########################################################
 def runGame(matrix, exploreMethod):
 	currentState = State(None,matrix,'white',0)
 	while currentState.getDepth()<5:
@@ -614,13 +678,24 @@ def runGame(matrix, exploreMethod):
 			(score,currentState,nodesExplored) = alpha_beta_max(currentState,-10000000, 10000000,0,exploreMethod)
 			print('nodes explored: '+str(nodesExplored) )
 			print('score: ' + str(score))			
-			#add code for AI
 		else:
 			(score,currentState,nodesExplored) = alpha_beta_min(currentState,-10000000, 10000000,0,exploreMethod)
 			print('nodes explored: '+str(nodesExplored) )
 			print('score: ' + str(score))
 
-#Main method that runs with white player simulated by the AI
+
+
+
+###########################################################	
+# Method: Run Game by User input                          
+# Paramters: 
+# 	currentState: the state we are currently at
+#	exploreMethod: The explore method being used for children
+#			nodes, it take values of 1 or 2.
+# Returns:  Nothing. Just plays the game until finished
+#			by capture of either king or by user input 'finish'
+#                                 
+###########################################################
 def runGameUser(matrix,exploreMethod):
 	currentState = State(None,matrix,'white',0)
 	finish = False
@@ -632,11 +707,13 @@ def runGameUser(matrix,exploreMethod):
 			print("The game has ended")
 			return
 
+		#the black player is simulated by the AI
 		if currentState.getTurn() == 'black':
 			(score,currentState,nodesExplored) = alpha_beta_min(currentState,-10000000, 10000000,0,exploreMethod)
 			print('nodes explored: '+str(nodesExplored) )
 			print('score: ' + str(score))			
-			#add code for AI
+
+		#the white player is the user
 		else:
 			validEntry = False
 			while validEntry == False:
@@ -658,7 +735,15 @@ def runGameUser(matrix,exploreMethod):
 	print("The game has ended")
 
 
-#look for checkmate of the player's king. Will make use of valid moves function for opponent pieces
+###########################################################	
+# Method: End Game Condition
+# Checks if either king is missing from the board.                      
+# Paramters: 
+# 	currentState: the state we are currently at
+# Returns:  False if both kings are present. True if one
+#			king is missing. Prints statements accordingly
+#                                 
+###########################################################
 def endgame(currentState):
 	whiteWin = True
 	blackWin = True
@@ -676,4 +761,5 @@ def endgame(currentState):
 		print('The Black Player has won!')
 
 	return (whiteWin or blackWin)
+
 
