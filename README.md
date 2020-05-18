@@ -1,17 +1,20 @@
 # ChessAI
 This AI makes use of H-MiniMax to determine the next move. Alpha-Beta pruning is used to reduce computational time and improve efficiency. After testing the AI over different board configurations, it was found that the AI makes only valid and makes “smart” moves to increase chances of winning i.e. to capture the king. 
+<p align="center">
+  <img width="419" height="364" src="https://github.com/abdulqadeer47/ChessAI/blob/master/example.png">
+</p>
 
 To run the program:
 
-1) Save all three files in a known folder on a computer. 
+1) Save all three python files in a known folder on a computer. 
 
-2) Run lab2.py from the command line using: python3 lab2.py
+2) Run ChessAI.py from the command line using: python3 ChessAI.py
 
 3) And press enter/return.
 
-This will run the three initial states for the next 5 moves with the first evaluation function. Then you play as the white player, with the black player being simulated by the AI.
+Now you play as the white player, with the black player being simulated by the AI.
 
-********************  Modifications *********************
+
 Upon starting the program asks for exploration method to be selected. There are two options
 
 Exploration Policy 1: a random shuffle in both pieces and possible moves for each piece
