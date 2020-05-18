@@ -676,12 +676,12 @@ def runGame(matrix, exploreMethod):
 
 		if currentState.getTurn() == 'white':
 			(score,currentState,nodesExplored) = alpha_beta_max(currentState,-10000000, 10000000,0,exploreMethod)
-			print('nodes explored: '+str(nodesExplored) )
-			print('score: ' + str(score))			
+			#print('nodes explored: '+str(nodesExplored) )
+			#print('score: ' + str(score))			
 		else:
 			(score,currentState,nodesExplored) = alpha_beta_min(currentState,-10000000, 10000000,0,exploreMethod)
-			print('nodes explored: '+str(nodesExplored) )
-			print('score: ' + str(score))
+			#print('nodes explored: '+str(nodesExplored) )
+			#print('score: ' + str(score))
 
 
 
@@ -710,15 +710,15 @@ def runGameUser(matrix,exploreMethod):
 		#the black player is simulated by the AI
 		if currentState.getTurn() == 'black':
 			(score,currentState,nodesExplored) = alpha_beta_min(currentState,-10000000, 10000000,0,exploreMethod)
-			print('nodes explored: '+str(nodesExplored) )
-			print('score: ' + str(score))			
+			#print('nodes explored: '+str(nodesExplored) )
+			#print('score: ' + str(score))			
 
 		#the white player is the user
 		else:
 			validEntry = False
 			while validEntry == False:
 				print('Your turn (White Player)')
-				print('enter starting position and end position (example:\'a2 a3\'')
+				print('enter starting position and end position (example:\'a2 a3\''')' )
 				user = input()
 				if user == 'finish':
 					finish = True
